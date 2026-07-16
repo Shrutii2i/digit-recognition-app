@@ -7,13 +7,13 @@
 </head>
 <body>
     <h1>Draw a digit</h1>
-    <canvas id="drawCanvas" width="280" height="280" style="border: 1px solid black;"></canvas>
+    <canvas id="drawCanvas" width="280" height="280" style="border: 1px solid black;"></canvas> <!---this a canvas box pixal-->
     <br>
     <button id="clearBtn">Clear</button>
     <button id="predictBtn">Predict</button>
     <p id="result"></p>
     <script>
-    const canvas = document.getElementById('drawCanvas');
+    const canvas = document.getElementById('drawCanvas'); //this where canvas var hold the drawCanvas which is used by getElement by Id 
     const ctx = canvas.getContext('2d');
     let isDrawing= false;
 
@@ -33,7 +33,7 @@
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
-    ctx.lineWidth = 15;
+    ctx.lineWidth = 10;
     ctx.lineCap = 'round';
     ctx.lineTo(x, y);
     ctx.stroke();
@@ -45,6 +45,27 @@ document.getElementById('clearBtn').addEventListener('click', () => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 });
 
+
+
+document.getElementById('predictBtn').addEventListener('click', () => {
+    const imageData = canvas.toDataURL();
+
+    fetch('http://127.0.0.1:5000/predict', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ image: imageData })
+    })
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById('result').textContent = 'Prediction: ' + data.digit;
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        document.getElementById('result').textContent = 'Error connecting to server';
+    });
+});
     </script>
 </body>
 </html>
